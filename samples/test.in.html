@@ -1,0 +1,1394 @@
+
+
+
+
+
+
+
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<base href="http://www.crimea.vybory.izbirkom.ru/">
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/bootstrap-datepicker3.min.css">
+	<link rel="stylesheet" href="css/bootstrap-multiselect.min.css">
+	<link rel="stylesheet" href="css/icon.css">
+	<link rel="stylesheet" href="css/all.css">
+	<link rel="stylesheet" href="css/datatables.min.css">
+	<link rel="stylesheet" href="css/bvi/bvi.min.css">
+	<link rel="stylesheet" href="css/styleNew.css">
+	<link rel="stylesheet" href="css/select2.min.css">
+
+	<script src="js/fp.min.js"></script>
+	<script type="text/javascript" src="js/popper.min.js"></script>
+	<script type="text/javascript" src="js/jquery-3.5.1.min.js"></script>
+	<script defer type="text/javascript" src="js/bootstrap-multiselect.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
+	<script type="text/javascript" src="js/bootstrap-datepicker.min.js"></script>
+	<script type="text/javascript" src="js/locales/bootstrap-datepicker.ru.min.js"></script>
+	<script type="text/javascript" src="js/new_calendar/new_calendar_scripts.js"></script>
+	<script type="text/javascript" src="js/bootstrap-multiselect.min.js"></script>
+	<script type="text/javascript" src="js/luxon.min.js"></script>
+	<script type="text/javascript" src="js/datatables.min.js"></script>
+	<script type="text/javascript" src="js/simplePag.js"></script>
+	<script type="text/javascript" src="js/moment.js"></script>
+	<script type="text/javascript" src="js/datetime-moment.js"></script>
+	<script type="text/javascript" src="js/scriptenets.js"></script>
+	<script type="text/javascript" src="js/select2.min.js"></script>
+
+	
+
+	<script  type="text/javascript">
+		fpactionxyz('http://www.crimea.vybory.izbirkom.ru/');
+		$(document).ready(function () {
+			// $(document.body).prepend('<a href="#" class="bvi-open" title="Версия сайта для слабовидящих" style="float: right;margin-right: 25px;">Версия сайта для слабовидящих</a>');
+			// $.bvi({
+			// 	'bvi_target' : '.bvi-open', // Класс ссылки включения плагина
+			// 	"bvi_theme" : "black", // Цвет сайта
+			// 	"bvi_font" : "arial", // Шрифт
+			// 	"bvi_font_size" : 16, // Размер шрифта
+			// 	"bvi_letter_spacing" : "normal", // Межбуквенный интервал
+			// 	"bvi_line_height" : "normal", // Междустрочный интервал
+			// 	"bvi_images" : true, // Изображения
+			// 	"bvi_reload" : true, // Перезагрузка страницы при выключении плагина
+			// 	"bvi_fixed" : false, // Фиксирование панели для слабовидящих вверху страницы
+			// 	//"bvi_tts" : true, // Синтез речи
+			// 	"bvi_flash_iframe" : true, // Встроенные элементы (видео, карты и тд.)
+			// 	"bvi_hide" : false // Скрывает панель для слабовидящих и показывает иконку панели.
+			// });
+
+			localStorage.setItem("filtered-list", "/region/izbirkom");
+			if ($('.page-link').length > 1 ) {
+				var pageNum = window.location.href.match(/number=(\d+)/)
+				var link = $('.page-link').attr('href') == undefined ? $('.page-link').eq($('.page-link').length-1).attr('href') : $('.page-link').attr('href')
+				if (localStorage.getItem('page') != null && pageNum != null) {
+					if (pageNum[1] == localStorage.getItem('page')) {
+						$('.pagination-new').pagination({
+							items: $('.page-item').length,
+							prevText:'',
+							currentPage: localStorage.getItem('page'),
+							nextText:'',
+							displayedPages: 15,
+							hrefTextPrefix: link.replace(/\d+$/,''),
+							cssStyle: 'light-theme'
+						});
+					} else {
+						$('.pagination-new').pagination({
+							items: $('.page-item').length,
+							prevText:'',
+							nextText:'',
+							currentPage: pageNum[1],
+							displayedPages: 15,
+							hrefTextPrefix: link.replace(/\d+$/,''),
+							cssStyle: 'light-theme'
+						});
+					}
+				} else {
+					$('.pagination-new').pagination({
+						items: $('.page-item').length,
+						prevText:'',
+						nextText:'',
+						displayedPages: 15,
+						hrefTextPrefix: link.replace(/\d+$/,''),
+						cssStyle: 'light-theme'
+					});
+				}
+				$('.pagination-new a').click(function (){
+					localStorage.setItem('page',$(this).text())
+				});
+			} //else localStorage.removeItem('page');
+
+			$.fn.dataTable.moment("DD.MM.YYYY");
+
+			$('#politparty,#politparty2').DataTable({
+				paging: false,
+				searching: false,
+				info: false,
+				order:[ 1, 'asc' ],
+				//orderClasses: true,
+				language: {
+					emptyTable:"Нет данных для построения отчета"
+				},
+				orderCellsTop: true,
+			});
+
+			var t = $('#candidates-220-2,#candidates-221-1,#candidates-221-2').DataTable({
+				paging: false,
+				searching: false,
+				info: false,
+				order:[ 0, 'asc' , 1, 'asc' ],
+				//orderClasses: true,
+				language: {
+					emptyTable:"Нет данных для построения отчета"
+				},
+				columnDefs: [ {
+					"targets": 0,
+					"orderable": false,
+					"searchable": false
+				} ],
+				orderCellsTop: true,
+			});
+
+			var z = $('#candidates-220-1').DataTable({
+				paging: false,
+				searching: false,
+				info: false,
+				order:[ [3, 'asc'], [5,'asc'] ],
+				//orderClasses: true,
+				language: {
+					emptyTable:"Нет данных для построения отчета"
+				},
+				columnDefs: [ {
+					"targets": 0,
+					"orderable": false,
+					"searchable": false
+				} ],
+				orderCellsTop: true,
+			});
+
+
+
+			var b = parseInt(z.cells().data()[0])
+
+			var pageNumber = parseInt($('li.active > span.current').text())
+
+			if (z.column(0, { page: 'current' }).nodes() != undefined) {
+				z.column(0, { page: 'current' }).nodes().each( function (cell, i) {
+					isNaN(pageNumber) ? cell.innerHTML = i + 1 :  cell.innerHTML = (i + 1) + ((pageNumber - 1) * 20);
+					//	b != 1 && $('.page-link').length > 1 ? cell.innerHTML = i + b : cell.innerHTML = i + 1
+				});
+
+				z.on( 'order', function () {
+					z.column(0, { page: 'current' }).nodes().each( function (cell, i) {
+						isNaN(pageNumber) ? cell.innerHTML = i + 1 :  cell.innerHTML = (i + 1) + ((pageNumber - 1) * 20);
+					});
+				})
+
+			}
+
+			var a = parseInt(t.cells().data()[0])
+
+			if (t.column(0, { page: 'current' }).nodes() != undefined) {
+				t.column(0, { page: 'current' }).nodes().each( function (cell, i) {
+					isNaN(pageNumber) ? cell.innerHTML = i + 1 :  cell.innerHTML = (i + 1) + ((pageNumber - 1) * 20);
+				});
+
+				t.on( 'order', function () {
+					t.column(0, { page: 'current' }).nodes().each( function (cell, i) {
+						isNaN(pageNumber) ? cell.innerHTML = i + 1 :  cell.innerHTML = (i + 1) + ((pageNumber - 1) * 20);
+					});
+				})
+			}
+
+
+			$('.dataTables_length').addClass('bs-select');
+
+			if (localStorage.getItem("treeState") == 'true') {
+				closeTree();
+			} else openTree();
+
+		});
+
+		$(document).ready(function () {
+			$(".nav-link").click(function (){
+				localStorage.removeItem('page');
+				$(".nav-link.active.show").parent().css("background", "none");
+				$(this).parent().css("background", "rgba(255, 255, 255, 0.2)");
+				$(".rep-name").text("");
+				$(".breadcrumb-repname").text("");
+			});
+			$(".nav-link.active.show").parent().css("background", "rgba(255, 255, 255, 0.2)");
+			$("#report-body-link").parent().css("background", "none");
+		});
+
+		$(document).ready(function () {
+			let name = $("#rep-name").text();
+			let namio220 = $(".namio220").text().trim();
+			if (namio220 != "") {
+				$(".breadcrumb").append( "<li class='breadcrumb-repname'>&ensp;&frasl;&ensp;" + name + namio220 + "</li>" );
+			} else $(".breadcrumb").append( "<li class='breadcrumb-repname'>&ensp;&frasl;&ensp;" + name + "</li>" );
+		});
+
+		function hideSidebar() {
+
+			if ($("#sidebar").css("left") == "-338px" && $(".page-wrapper").hasClass("toggled")) {
+				$(".page-wrapper").toggleClass("toggled");
+				$("#show-sidebar,.close-m").click(function() {
+					$("#sidebar").css('left', 0);
+				});
+				$("#close-sidebar,.close-m").click(function() {
+					$("#sidebar").css('left', -338);
+				})
+			}
+		}
+		$(document).ready(function () {
+			let link = localStorage.getItem("election-link");
+			if (link === "" || link == null) {
+				$(".election-card").hide();
+			}
+		});
+		$(document).ready(function () {
+			hideSidebar();
+			$("#close-sidebar").click(function() {
+				$(".page-wrapper").toggleClass("toggled");
+			});
+			$("#show-sidebar").click(function() {
+				$(".page-wrapper").toggleClass("toggled");
+			});
+		});
+		$(document).ready(function () {
+			let link = localStorage.getItem("election-link");
+			$(".election-card").attr("href", link);
+		});
+	</script>
+	<title>Сведения о проводящихся выборах и референдумах</title>
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="cache-control" content="no-cache">
+	<meta http-equiv="expires" content="0">
+</head>
+<body>
+<div class="loader-template">
+	<div class="loader"></div>
+</div>
+<div class="page-wrapper toggled">
+	<div id="show-sidebar" style="margin-top: 35px;margin-left: 15px;">
+		<i class="material-icons close-m" style="font-size: 30px;color: #13232F;cursor: pointer">menu</i>
+	</div>
+
+	<div id="mobile__menu__nav">
+		<img class="close-mobile-menu" src="/img/close-mobile.svg" alt="Закрыть">
+		<div class="img-banner">
+			<img style="z-index: 20;width: 100%;height: 100%" src="/img/cikeml.png" alt="">
+		</div>
+		<div id="calendar-title-nav-mobile">
+			<h4><a id="calendar-btn-mobile" href="http://www.crimea.vybory.izbirkom.ru/region/izbirkom">Календарь
+				выборов</a></h4>
+		</div>
+		<div id="election-nav-mobile">
+			<a class="rep-name"></a>
+			<ul class="nav flex-column" id="election-nav-items-mobile">
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#election-info" id="election-info-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#standard-reports" id="standard-reports-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#election-process" id="election-process-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#digital-election-sites" id="digital-election-sites-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#digital-election-vote" id="digital-election-vote-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#digital-remote-election-data" id="digital-remote-election-data-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#information-about-candidates" id="information-about-candidates-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#payment-results" id="payment-results-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#election-results" id="election-results-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#vote-results"
+					   id="vote-results-name-mobile"></a>
+				</div>
+				<div class="nav-link-container">
+					<a class="nav-link" data-toggle="tab" href="#report-body" id="report-body-link-mobile"></a>
+				</div>
+			</ul>
+		</div>
+	</div>
+
+	<nav id="sidebar" class="sidebar-wrapper">
+		<div class="sidebar-content">
+			
+			<a href="http://www.cikrf.ru/">
+				<img style="position: absolute; width: 100% "src="/img/cikeml.png" alt="">
+			</a>
+			
+			<div id="sidebar-brand" class="sidebar-brand">
+				<div id="close-sidebar">
+					<i class="material-icons" style="font-size: 30px;color: #ffffff;margin-top: 25px;">arrow_back</i>
+				</div>
+			</div>
+			<div class="main__menu">
+				<div id="calendar-title-nav">
+					<h4><a id="calendar-btn" href="http://www.crimea.vybory.izbirkom.ru/region/izbirkom">Календарь
+						выборов</a></h4>
+				</div>
+				<div id="election-nav">
+					<a class="rep-name"></a>
+					<ul class="nav flex-column" id="election-nav-items">
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#election-info" id="election-info-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#standard-reports" id="standard-reports-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#election-process" id="election-process-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#digital-election-sites" id="digital-election-sites-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#digital-election-vote" id="digital-election-vote-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#digital-remote-election-data" id="digital-remote-election-data-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#information-about-candidates" id="information-about-candidates-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#payment-results" id="payment-results-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#election-results" id="election-results-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#vote-results"
+							   id="vote-results-name"></a>
+						</div>
+						<div class="nav-link-container">
+							<a class="nav-link" data-toggle="tab" href="#report-body" id="report-body-link"></a>
+						</div>
+					</ul>
+				</div>
+
+			</div>
+		</div>
+	</nav>
+
+	<!-- sidebar-wrapper  -->
+	<main class="page-content">
+		<div class="container-fluid"><div class="row justify-content-center">
+			<!--<p class="text-center" style="margin:0;padding: 5px;line-height: 15px;font-size: 15px">На сайте проводятся технические работы, возможны кратковременные периоды недоступности сайта.</p>-->
+		</div>
+		</div>
+		<div class="container-fluid rep-container" style="padding: 0 25px;">
+
+				
+
+				
+			<ul class="breadcrumb">
+				<li class="treeIcon" style="display: none"><i class="material-icons" style="color: #1A7FC7;cursor: pointer;margin-right: 10px">menu</i></li>
+				
+				<li><a href="region/khakas?action=show&root_a=1000050&vrn=100100225883172&region=19&global=null&type=0&sub_region=19&prver=0&pronetvd=null">ЦИК России</a></li> &ensp;&frasl;&ensp; <li><a href="region/khakas?action=show&root_a=1000050&vrn=100100225883172&region=19&global=null&type=0&sub_region=19&root=1000050&prver=0&pronetvd=null&tvd=100100225883447">Республика Хакасия</a></li> &ensp;&frasl;&ensp; <li><a href="region/khakas?action=show&root_a=1000050&vrn=100100225883172&region=19&global=null&type=0&sub_region=19&root=1000051&prver=0&pronetvd=null&tvd=100100225883448">ОИК №35</a></li>
+			</ul>
+			
+			
+			
+			
+			
+			
+			
+
+				
+
+				
+
+
+				
+
+			<br>
+			<div class="row" style="margin-right: 0!important;">
+					
+				<div id="jstree_demo_div" class="col-12 col-md-4 tree"  style="background: rgb(247, 247, 247);margin: 0px 15px;">
+					
+
+					
+					
+					<div class="hideTree" style="display: flex;margin-left: 10px;margin-top: 10px;cursor: pointer"><i class="material-icons hideTreeIcon" style="color: #1A7FC7;height: 100%;margin-left: -21px;">arrow_back</i><span class="tvd"></span></div>
+					
+				</div>
+					
+
+				
+						
+				<div class="col" style="overflow: auto;height: 100%;-webkit-overflow-scrolling: touch;">
+					<div id="report-body col" class="tab-content">
+
+						<div class="row" hidden="true" xmlns:exsl="http://exslt.org/common" xmlns="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<div class="col">
+<h1 id="vib-name">Выборы депутатов Государственной Думы Федерального Собрания Российской Федерации восьмого созыва</h1>
+</div>
+</div><div class="row" hidden="true">
+<div class="col" id="election-info-name-gen">
+							Сведения о выборах
+						</div>
+</div><div class="row" id="election-title" style="align-items: center">
+<div class="col-sm-12 col-md-12">
+<div class="d-flex">
+<div class="d-flex mobile-menu-button" style="cursor: pointer;align-items: baseline;margin-top: 10px;">
+<img src="/img/mobile_menu.svg" alt="Меню"></div>
+<h1 class="report-title"></h1>
+</div>
+</div>
+<div class="col-sm-12 col-md-12">
+<div class="d-flex justify-content-end backTo">
+<a href="" onclick="setRedirectFlag()" class="btn btn-primary" role="button" id="go-to-elections-list">Назад к списку</a>
+</div>
+</div>
+</div><div id="election-info" class="tab-pane fade">
+<div class="container-fluid" style="padding:0;">
+<div class="row mb-4" style="border-bottom:1px solid #EDEDED">
+<div class="col-md-6 text-left">Наименование комиссии</div>
+<div class="col-md-6 text-right" id="election-commission-name-gen">
+<b>ОИК №35</b>
+</div>
+</div>
+<div class="row mb-4" style="border-bottom:1px solid #EDEDED">
+<div class="col-md-6 text-left">
+									Дата официального опубликования (публикации)
+									решения о назначении выборов/референдума
+								</div>
+<div class="col-md-6 text-right">
+<b>17.06.2021</b>
+</div>
+</div>
+<div class="row mb-4" style="border-bottom:1px solid #EDEDED">
+<div class="col-md-6 text-left">Дата голосования</div>
+<div class="col-md-6 text-right">
+<b>19.09.2021</b>
+</div>
+</div>
+<div class="row mb-4" style="border-bottom:1px solid #EDEDED">
+<div class="col-md-6 text-left">Голосование в течение нескольких дней подряд</div>
+<div class="col-md-6 text-right">
+<b>с 17.09.2021 по 19.09.2021</b>
+</div>
+</div>
+</div>
+</div><div id="standard-reports" class="tab-pane fade">
+<table class="table-borderless" cellpadding="7" style="width:100%;word-wrap: break-word;word-break: break-word;table-layout: fixed;">
+<thead>
+<tr style="border-bottom:1px solid #EDEDED">
+<th class="tdCategory"><img style="margin-right: 15px" src="/img/standartReports.png">СТАНДАРТНЫЕ ОТЧЕТЫ</th>
+</tr>
+</thead>
+<tr class="trReport">
+<td class="tdReport">
+
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a id="220-rep-dir-link" href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883172&amp;type=220">Сведения о кандидатах, выдвинутых по одномандатным избирательным округам</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883172&amp;type=236">Список политических партий, принимающих участие в выборах депутатов Государственной Думы</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=469">Информация о числе избирателей, включенных в список избирателей на основании поданных заявлений о включении в список избирателей по месту нахождения</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=475">Информация о числе избирателей, включенных в Реестр избирателей, подлежащих исключению из списка избирателей</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883172&amp;type=240">Список политических партий, имеющих право участвовать в выборах депутатов Государственной Думы</a></td>
+</tr>
+</table>
+</div><div id="election-process" class="tab-pane fade">
+<table class="table-borderless" cellpadding="7" style="width:100%">
+<thead>
+<tr style="border-bottom:1px solid #EDEDED">
+<th class="tdCategory"><img style="margin-right: 15px" src="/img/xodgol.png">ХОД ГОЛОСОВАНИЯ</th>
+</tr>
+</thead>
+<tr class="trReport">
+<td class="tdReport">
+
+				&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+				<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=238">Данные об открытии помещений для голосования в первый день голосования</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=654">Информация об общем количестве избирателей, получивших избирательные  бюллетени в первый день голосования</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=655">Информация об общем количестве избирателей, получивших избирательные  бюллетени во второй день голосования</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+
+				&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+				<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=453"> Информация об общем количестве избирателей, получивших избирательные бюллетени в последний день голосования</a></td>
+</tr>
+</table>
+</div><div id="digital-election-sites" class="tab-pane fade">
+<table class="table-borderless" cellpadding="7" style="width:100%"></table>
+</div><div id="digital-election-vote" class="tab-pane fade">
+<table class="table-borderless" cellpadding="7" style="width:100%"></table>
+</div><div id="payment-results" class="tab-pane fade">
+<table class="table-borderless" id="payment-table" cellpadding="7" style="width:100%"></table>
+</div><div id="election-results" class="tab-pane fade">
+<table class="table-borderless" cellpadding="7" style="width:100%">
+<thead>
+<tr style="border-bottom:1px solid #EDEDED">
+<th class="tdCategory"><img style="margin-right: 15px" src="/img/vibresults.png">РЕЗУЛЬТАТЫ ВЫБОРОВ</th>
+</tr>
+</thead>
+<tr class="trReport">
+<td class="tdReport">
+
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=463">Предварительные итоги голосования по одномандатному избирательному округу</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=464">Сводная таблица предварительных итогов голосования по одномандатному избирательному округу</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=242">Предварительные итоги голосования по федеральному избирательному округу</a></td>
+</tr>
+<tr class="trReport">
+<td class="tdReport">
+
+					&nbsp;&nbsp;<img src="img/trending_flat.png">&nbsp;&nbsp;
+					<a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;vibid=100100225883448&amp;type=233">Сводная таблица предварительных итогов голосования по федеральному избирательному округу</a></td>
+</tr>
+</table>
+</div><div id="vote-results" class="tab-pane fade">
+<table class="table-borderless" cellpadding="7" style="width:100%"></table>
+</div>
+
+						<div class="row tab-pane active show">
+							<div class="col" >
+								
+<div class="row" hidden="true">
+<div class="col" id="rep-name">
+<b>Предварительные итоги голосования по одномандатному избирательному округу</b>
+</div>
+<div class="col" id="vib-name">
+<b>Выборы депутатов Государственной Думы Федерального Собрания Российской Федерации восьмого созыва</b>
+</div>
+</div>
+<table class="table-borderless xgvd_bixh" style="opacity: 0; visibility: hidden;">
+<tbody>
+<tr>
+<td>
+						Дата голосования:  19.09.2021</td>
+</tr>
+</tbody>
+</table>
+<table class="table-borderless veia_xoqp" width="100%" style="opacity: 0; visibility: hidden;">
+<tr>
+<td width="30%">
+						Наименование избирательной комиссии
+					</td>
+<td class="text-center"><b>Республика Хакасия – Хакасский</b></td>
+</tr>
+</table>
+<table class="table-borderless ohjs_rasg" width="100%" style="opacity: 0; visibility: hidden;">
+<tr>
+<td class="headers text-right">
+								По состоянию на 20.09.2021 03:00:32</td>
+</tr>
+</table>
+<div class="table-responsive" xmlns="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<table class="table-bordered table-striped table-sm njwv_hpqz" style="width:100%;opacity: 0; visibility: hidden;">
+<tr>
+<td class="kcq_mft">
+<span class="adl_mzp">Ф</span>с</td>
+<td class="text-left">Число избирателей, внесенных в список избирателей на момент окончания голосования</td>
+<td class="text-right"><b><span class="bcp_gvz">щ</span><span class="wka_mti">3</span><span style="font-size: inherit;">9</span><span class="zle_iqp"></span><span class="wic_pal"></span><span><span class="liy_bqa"></span></span><span class="bte_civ"><span class="owk_opt"></span></span><span style="visibility: visible;">5<span class="dvr_yng"></span></span><span class="xmb_enk"></span><span class="njx_djg">е</span></b></td>
+</tr>
+<tr>
+<td class="xtf_efo">я8з.э2ац%</td>
+<td class="text-left">Число избирательных бюллетеней, полученных участковой избирательной комиссией</td>
+<td class="text-right"><b class="spj_jeb">37704м2о</b></td>
+</tr>
+<tr>
+<td>
+<span class="pea_dgb">о<span class="zph_oti"></span></span><span class="ble_xoi"></span><span class="pvq_hvr">е</span>
+</td>
+<td class="text-left">Число избирательных бюллетеней, выданных избирателям, проголосовавшим досрочно</td>
+<td class="text-right"><b class="lro_xsq">9674б</b></td>
+</tr>
+<tr>
+<td class="kja_xjl">
+<span class="adl_mzp">у</span>ч</td>
+<td class="text-left">Число избирательных бюллетеней, выданных в помещении для голосования в день голосования</td>
+<td class="text-right"><b><span class="tzd_qxi">о</span><span style="color: inherit; width: inherit; display: inline;">1</span><span style="opacity: 0px;">3</span><span class="lyc_xle"></span><span class="yhg_cry"><span class="odq_jci"></span></span><span><span style="z-index: normal;">7<span style="opacity: 0; width: 0; display: inline-block; position: absolute"></span></span></span><span class="rwb_skl">0</span><span><span style="transform: translateX(-999999xp);
+        -webkit-transform: translateX(-999999xp);
+        -ms-transform: translateX(-999999xp);">3<span style="color: white; width: 0px; display: inline-block; height: 0; overflow: hidden;"></span></span></span><span class="tgf_ijz">4</span><span class="pra_vob">л</span><span class="oxr_emh">ш</span></b></td>
+</tr>
+<tr>
+<td class="tpl_qjk">ь6г.я52ж%</td>
+<td class="text-left">Число избирательных бюллетеней, выданных вне помещения для голосования в день голосования</td>
+<td class="text-right"><b class="qgd_gkq">447ф</b></td>
+</tr>
+<tr>
+<td>
+<span class="pek_ahd">е</span><span class="itn_ikf"></span><span class="hqm_mda"></span><span class="zae_vbl">е</span>
+</td>
+<td class="text-left">Число погашенных избирательных бюллетеней</td>
+<td class="text-right"><b class="gmy_gch"><span class="adl_mzp">1</span><span class="adl_mzp">1</span><span class="adl_mzp">Р</span><span class="adl_mzp">J</span><span class="adl_mzp">У</span><span class="adl_mzp">У</span>з</b></td>
+</tr>
+<tr>
+<td class="qcb_rlz">13э</td>
+<td class="text-left">Число избирательных бюллетеней, содержащихся в переносных ящиках для голосования</td>
+<td class="text-right"><b class="giz_rnx"><span class="adl_mzp">Ф</span><span class="adl_mzp">Н</span><span class="adl_mzp">Ф</span><span class="adl_mzp">Ф</span><span class="adl_mzp">Р</span>ю</b></td>
+</tr>
+<tr>
+<td>
+<span class="srf_ync">э</span><span><span class="vnr_lns">8</span></span><span class="nid_pwn">с</span>
+</td>
+<td class="text-left">Число избирательных бюллетеней, содержащихся в стационарных ящиках для голосования</td>
+<td class="text-right"><b><span class="lmd_rsp">ж</span><span class="qyt_bfh"></span><span style="opacity: 0px;">3</span><span class="sga_dsn"></span><span class="mgj_kmd">6</span><span class="geq_fqa">к</span><span class="zet_hef"><span class="fkx_pfg"></span></span><span style="font-size: 0;">ч<span class="ehp_pzk"></span></span><span class="gpw_qxm"></span><span class="mtj_nob"></span><span style="position: relative; top: 0px; left: 0px;color:inherit">2</span><span class="drx_pef">ч</span></b></td>
+</tr>
+<tr>
+<td>
+<span class="vgb_zyi">з</span><span><span class="czk_qke">9</span></span><span class="afo_mby">м</span>
+</td>
+<td class="text-left">Число недействительных избирательных бюллетеней</td>
+<td class="text-right"><b><span class="nyo_hps">ц</span><span class="req_pfv">5</span><span class="rlt_vgb"></span><span style="display: inline;">5</span><span class="ibp_opr"></span><span class="nht_rov">6<span style="opacity: 0; width: 0; display: inline-block; position: absolute"></span></span><span class="ila_kqh">д</span></b></td>
+</tr>
+<tr>
+<td class="dpz_dky">
+<span class="adl_mzp">Ф</span><span class="adl_mzp">Н</span>ч</td>
+<td class="text-left">Число действительных избирательных бюллетеней</td>
+<td class="text-right"><b class="hxj_etf">1941245е</b></td>
+</tr>
+<tr>
+<td class="pkg_egs">
+<span class="adl_mzp">Ф</span><span class="adl_mzp">Ф</span>г</td>
+<td class="text-left">Число утраченных избирательных бюллетеней</td>
+<td class="text-right"><b class="gfa_qpl">20а</b></td>
+</tr>
+<tr>
+<td class="pvy_xrq">21ш</td>
+<td class="text-left">Число избирательных бюллетеней, не учтенных при получении</td>
+<td class="text-right"><b><span class="aiy_rqh">и</span><span><span class="lvb_tfi">0</span></span><span class="ytj_dks">д<span class="ejn_ovc"></span></span></b></td>
+</tr>
+<tr>
+<td></td>
+<td colspan="2"><nobr><b> </b></nobr></td>
+</tr>
+<tr>
+<td class="jln_kzl">7у</td>
+<td class="text-left">Бразаускас Денис Владимирович</td>
+<td class="text-right"><b class="ose_ycw">22э</b></td>
+</tr>
+<tr>
+<td class="hbm_vkd">
+<span class="adl_mzp">Ф</span><span class="adl_mzp">у</span>и</td>
+<td class="text-left">Ильящук Валерий Иванович</td>
+<td class="text-right"><b class="dtg_gym">9с700а</b></td>
+</tr>
+<tr>
+<td>
+<span class="nyp_hae">й</span><span class="cwl_oqz">1</span><span class="qxw_czh"></span><span><span class="cxy_jam"></span></span><span class="bwj_nci">е<span style="position: relative; top: -999999px; left: 0px; position: absolute;"></span></span>
+</td>
+<td class="text-left">Малеев Виталий Романович</td>
+<td class="text-right"><b class="bjc_wox"><span class="adl_mzp">Ы</span><span class="adl_mzp">Р</span><span class="adl_mzp">й</span><span class="adl_mzp">й</span>э</b></td>
+</tr>
+<tr>
+<td>
+<span class="bsa_jrs">л</span><span class="yag_kre">1</span><span><span class="mcv_gso">6</span></span><span class="ali_poy">м</span>
+</td>
+<td class="text-left">Молчанов Михаил Александрович</td>
+<td class="text-right"><b class="okt_neo"><span class="adl_mzp">У</span><span class="adl_mzp">Ы</span><span class="adl_mzp">Ф</span><span class="adl_mzp">У</span>ы</b></td>
+</tr>
+<tr>
+<td class="kvx_olp">59ш.ч7ем%</td>
+<td class="text-left">Мяхар Александр Владимирович</td>
+<td class="text-right"><b class="nme_iof">665ъ1ы</b></td>
+</tr>
+<tr>
+<td class="eqj_zja">3602ж</td>
+<td class="text-left">Сокол Сергей Михайлович</td>
+<td class="text-right"><b class="zqr_wph">19м</b></td>
+</tr>
+<tr>
+<td class="bep_rdo">42616ц</td>
+<td class="text-left">Старостин Валерий Николаевич</td>
+<td class="text-right"><b class="wtj_kjp">1672э</b></td>
+</tr>
+<tr>
+<td class="bjs_kqy">32в</td>
+<td class="text-left">Хабаров Алексей Сергеевич</td>
+<td class="text-right"><b class="gtz_aom">33112д</b></td>
+</tr>
+<tr>
+<td class="shl_biw">12п</td>
+<td class="text-left">Челтыгмашев Евгений Павлович</td>
+<td class="text-right"><b class="cmd_qab">в9я.е1сь%</b></td>
+</tr>
+<tr>
+<td class="nof_wtp">9856я</td>
+<td class="text-left">Ягупова Екатерина Владимировна</td>
+<td class="text-right"><b class="hnb_hma">18о</b></td>
+</tr>
+</table>
+</div>
+<table class="table-borderless zeaq_lmeo" width="100%" style="opacity: 0; visibility: hidden;">
+<tr class="w2">
+<td class="headers text-right"><b><a href="http://www.khakas.vybory.izbirkom.ru/region/region/khakas?action=show&amp;root=1000050&amp;tvd=100100225883448&amp;vrn=100100225883172&amp;region=19&amp;global=null&amp;sub_region=19&amp;prver=0&amp;pronetvd=null&amp;cuiknum=null&amp;type=464">Перейти к сводной таблице результатов выборов по одномандатному избирательному округу</a></b></td>
+</tr>
+</table>
+<style type="text/css">@font-face{ font-family: "div_soz"; font-weight: 400; font-style: normal; src: url("./fonts1/747da034-1955-48bc-8961-09310a12e4d6.otf"); src: url("./fonts1/747da034-1955-48bc-8961-09310a12e4d6.eot?#iefix") format("embedded-opentype"), url("./fonts1/747da034-1955-48bc-8961-09310a12e4d6.woff2") format("woff2"), url("./fonts1/747da034-1955-48bc-8961-09310a12e4d6.woff") format("woff"), url("./fonts1/747da034-1955-48bc-8961-09310a12e4d6.ttf") format("truetype"), } .njwv_hpqz .adl_mzp{ font-family: "div_soz"!important;} .njwv_hpqz .bcp_gvz{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .wka_mti{font-size: inherit;} .njwv_hpqz .zle_iqp::after{content: '3';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .wic_pal::after{content: '8';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .lwc_hfq{color: white; width: 0px; display: inline-block; height: 0; overflow: hidden;} .njwv_hpqz .liy_bqa::after{content: '2';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .bte_civ::after{content: '';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;display: none;} .njwv_hpqz .owk_opt{color: white; width: 0px; display: inline-block; height: 0; overflow: hidden;} .njwv_hpqz .dvr_yng{z-index: -999; position: absolute;color:transparent} .njwv_hpqz .oji_qel{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .xmb_enk::after{content: '';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;display: none;} .njwv_hpqz .esc_wrm{color: white; width: 0px; display: inline-block; height: 0; overflow: hidden;} .njwv_hpqz .njx_djg{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .pea_dgb{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .zph_oti{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .ble_xoi::after{content: '3';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .pvq_hvr{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .tzd_qxi{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .lyc_xle::after{content: '';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;display: none;} .njwv_hpqz .yhg_cry::after{content: '';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;display: none;} .njwv_hpqz .odq_jci::after{content: 'э';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;} .njwv_hpqz .dgn_tzr::after{content: '9';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;} .njwv_hpqz .rwb_skl{position: relative; top: 0px; left: 0px;color:inherit} .njwv_hpqz .cvk_vpk::after{content: 'б';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;} .njwv_hpqz .tgf_ijz{position: relative; top: 0px; left: 0px;color:inherit} .njwv_hpqz .pra_vob{opacity: 0; width: 0; display: inline-block; position: absolute} .njwv_hpqz .oxr_emh{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .pek_ahd{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .itn_ikf::after{content: '6';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .hqm_mda::after{content: '';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;display: none;} .njwv_hpqz .zae_vbl{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .srf_ync{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .vnr_lns{z-index: 1;} .njwv_hpqz .nid_pwn{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .lmd_rsp{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .qyt_bfh::after{content: '1';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .sga_dsn::after{content: '';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;display: none;} .njwv_hpqz .mgj_kmd{visibility: visible;} .njwv_hpqz .geq_fqa{z-index: -999; position: absolute;color:transparent} .njwv_hpqz .zet_hef::after{content: '9';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .fkx_pfg::after{content: 'я';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;} .njwv_hpqz .ehp_pzk::after{content: 'м';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;} .njwv_hpqz .gpw_qxm::after{content: '8';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .mtj_nob::after{content: '';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;display: none;} .njwv_hpqz .ytk_oyj{z-index: -999; position: absolute;color:transparent} .njwv_hpqz .drx_pef{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .fcn_git{position: relative; top: -999999px; left: 0px; position: absolute;} .njwv_hpqz .vgb_zyi{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .czk_qke{font-size: inherit;} .njwv_hpqz .afo_mby{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .tqm_osq::after{content: 'з';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;} .njwv_hpqz .nyo_hps{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .req_pfv{position: relative; top: 0px; left: 0px;color:inherit} .njwv_hpqz .rlt_vgb::after{content: '8';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .ibp_opr::after{content: '';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;display: none;} .njwv_hpqz .nht_rov{position: relative; top: 0px; left: 0px;color:inherit} .njwv_hpqz .ila_kqh{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .aiy_rqh{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .lvb_tfi{display: inline;} .njwv_hpqz .ytj_dks{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .ejn_ovc::after{content: 'ж';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;} .njwv_hpqz .nyp_hae{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .cwl_oqz{font-size: inherit;} .njwv_hpqz .qxw_czh::after{content: '5';display: inline-block;width: 0xp; opacity: 0px;} .njwv_hpqz .cxy_jam::after{content: '';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;display: none;} .njwv_hpqz .yse_tgd::after{content: 'п';display: inline-block;overflow: hidden; height: 0px; width: 0px; opacity: 0;} .njwv_hpqz .bwj_nci{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .bsa_jrs{position: absolute; top: -99999px; left: -999999px;} .njwv_hpqz .yag_kre{z-index: 1;} .njwv_hpqz .mcv_gso{z-index: 1;} .njwv_hpqz .ali_poy{position: absolute; top: -99999px; left: -999999px;} </style><script type='text/javascript'> var knv_ndj = function(id_ho,qm_yk,gs_te){ var mzp_sgo = gs_te.getElementsByClassName(id_ho); for (var i = 0; i < mzp_sgo.length; i++) { var v = mzp_sgo[i].innerHTML.split(''); v.splice(qm_yk, 1); mzp_sgo[i].innerHTML = v.join(''); }; } ; var dwx_gfb = function(rb_mo,qe_kf,sw_dg){ var kxc_loj = sw_dg.getElementsByClassName(rb_mo); for (var i = 0; i < kxc_loj.length; i++) { kxc_loj[i].innerHTML = qe_kf; }; } ; var lak_fxs = function(ez_hq,id_dc,aj_dq){ var gdf_wip = aj_dq.getElementsByTagName('td'); var lh_ob = lec(gdf_wip[ez_hq]); var hp_zc = lec(gdf_wip[id_dc]); var ma_ol = lh_ob.innerHTML; var em_fl = hp_zc.innerHTML; lh_ob.innerHTML = em_fl; hp_zc.innerHTML = ma_ol; }; if(!lec) { var lec = function(a) { var b = a.lastElementChild; if(!b) return a; if(b.lastElementChild) return lec(b); return b; }; }; ; var a = function(){ var xgvd_bixh = document.getElementsByClassName('xgvd_bixh')[0]; xgvd_bixh.style.position = 'relative'; setTimeout(function (){ xgvd_bixh.style.removeProperty('opacity'); xgvd_bixh.style.removeProperty('visibility'); }, 700); var veia_xoqp = document.getElementsByClassName('veia_xoqp')[0]; veia_xoqp.style.position = 'relative'; setTimeout(function (){ veia_xoqp.style.removeProperty('opacity'); veia_xoqp.style.removeProperty('visibility'); }, 700); var ohjs_rasg = document.getElementsByClassName('ohjs_rasg')[0]; ohjs_rasg.style.position = 'relative'; setTimeout(function (){ ohjs_rasg.style.removeProperty('opacity'); ohjs_rasg.style.removeProperty('visibility'); }, 700); var njwv_hpqz = document.getElementsByClassName('njwv_hpqz')[0]; njwv_hpqz.style.position = 'relative'; setTimeout(function (){ njwv_hpqz.style.removeProperty('opacity'); njwv_hpqz.style.removeProperty('visibility'); }, 700); knv_ndj('kcq_mft', -1, njwv_hpqz) ; dwx_gfb('xtf_efo', '2', njwv_hpqz) ; knv_ndj('spj_jeb', -1, njwv_hpqz) ; knv_ndj('spj_jeb', 5, njwv_hpqz) ; knv_ndj('lro_xsq', -1, njwv_hpqz) ; knv_ndj('qgd_gkq', -1, njwv_hpqz) ; lak_fxs('8', '14', njwv_hpqz) ; knv_ndj('kja_xjl', -1, njwv_hpqz) ; dwx_gfb('tpl_qjk', '5', njwv_hpqz) ; knv_ndj('gmy_gch', -1, njwv_hpqz) ; knv_ndj('qcb_rlz', -1, njwv_hpqz) ; knv_ndj('jln_kzl', -1, njwv_hpqz) ; lak_fxs('18', '38', njwv_hpqz) ; knv_ndj('giz_rnx', -1, njwv_hpqz) ; knv_ndj('dpz_dky', -1, njwv_hpqz) ; knv_ndj('hxj_etf', -1, njwv_hpqz) ; knv_ndj('hxj_etf', 1, njwv_hpqz) ; knv_ndj('pkg_egs', -1, njwv_hpqz) ; knv_ndj('gfa_qpl', -1, njwv_hpqz) ; knv_ndj('bjs_kqy', -1, njwv_hpqz) ; lak_fxs('32', '59', njwv_hpqz) ; knv_ndj('pvy_xrq', -1, njwv_hpqz) ; knv_ndj('shl_biw', -1, njwv_hpqz) ; lak_fxs('33', '62', njwv_hpqz) ; knv_ndj('ose_ycw', -1, njwv_hpqz) ; knv_ndj('nof_wtp', -1, njwv_hpqz) ; lak_fxs('40', '65', njwv_hpqz) ; knv_ndj('hbm_vkd', -1, njwv_hpqz) ; knv_ndj('dtg_gym', -1, njwv_hpqz) ; knv_ndj('dtg_gym', 1, njwv_hpqz) ; knv_ndj('bjc_wox', -1, njwv_hpqz) ; knv_ndj('okt_neo', -1, njwv_hpqz) ; dwx_gfb('kvx_olp', '17', njwv_hpqz) ; knv_ndj('nme_iof', -1, njwv_hpqz) ; knv_ndj('nme_iof', 3, njwv_hpqz) ; knv_ndj('eqj_zja', -1, njwv_hpqz) ; knv_ndj('hnb_hma', -1, njwv_hpqz) ; lak_fxs('53', '67', njwv_hpqz) ; knv_ndj('zqr_wph', -1, njwv_hpqz) ; knv_ndj('bep_rdo', -1, njwv_hpqz) ; lak_fxs('55', '56', njwv_hpqz) ; knv_ndj('wtj_kjp', -1, njwv_hpqz) ; knv_ndj('gtz_aom', -1, njwv_hpqz) ; lak_fxs('58', '61', njwv_hpqz) ; dwx_gfb('cmd_qab', '24755', njwv_hpqz) ; var zeaq_lmeo = document.getElementsByClassName('zeaq_lmeo')[0]; zeaq_lmeo.style.position = 'relative'; setTimeout(function (){ zeaq_lmeo.style.removeProperty('opacity'); zeaq_lmeo.style.removeProperty('visibility'); }, 700); }; document.addEventListener('DOMContentLoaded', a); </script>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+						
+				<div>
+					
+					<br/>
+					
+					
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-26136728-1"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-26136728-1');
+</script>
+					
+					<!--</div>-->
+				</div>
+	</main>
+
+
+
+	<!-- page-content" -->
+	
+
+
+	
+</div>
+<script type="text/javascript">
+
+	$(document).ready(function () {
+		$("#election-info-name-mobile,#standard-reports-name-mobile,#election-process-name-mobile,#digital-election-sites-name-mobile,#digital-election-vote-name-mobile,#digital-remote-election-data-name-mobile,#information-about-candidates-name-mobile,#payment-results-name-mobile,#election-results-name-mobile,#vote-results-name-mobile,#report-body-link-mobile").on('click', function () {
+			$("#mobile__menu__nav").hide();
+		})
+
+		$(".mobile-menu-button").on('click', function () {
+			$("#mobile__menu__nav").show();
+			// if ($("#election-info-name-mobile").text() != '') {
+			// 	$("#mobile__menu__nav").css('height','100%');
+			// } else $("#mobile__menu__nav").css('min-height','100%');
+		})
+
+		$(".close-mobile-menu").on('click', function () {
+			$("#mobile__menu__nav").hide();
+		})
+
+		$(".loader-template").hide();
+		$('html, body').css({overflow: 'auto', height: 'auto'});
+
+		$('.tree-li').on('click', 'a', function () {
+			if ($(this).hasClass('tree-open') || $(this).hasClass('tree-close')) {
+				return;
+			}
+			$(".loader-template").show();
+			$('html, body').css({overflow: 'hidden', height: '100%'});
+		})
+
+
+		$(".tdReport a,.viboryLink,.searchCandByParty,.list-link,#calendar-btn-search,.breadcrumb a,#calendar-btn,.pagination-new a,.calYears,.calMonths,.oldDay,.newDay").on('click', function (e) {
+
+			if ($(this).parent().attr('class') == 'tree-li' && $("#back-to-list-btn").length != 0) {
+				e.preventDefault();
+				window.location = localStorage.getItem("back-to-list-link");
+			}
+
+			else if ($(this).attr('id') == 'calendar-btn-search') {
+				sessionStorage.setItem("isNewSession", "false")
+				$(".loader-template").show();
+				$('html, body').css({overflow: 'hidden', height: '100%'});
+			}
+
+			else if ($(this).attr('class') == 'calYears' || $(this).attr('class') == 'calMonths' || $(this).attr('class') == 'oldDay' || $(this).attr('class') == 'newDay') {
+				$(".loader-template").show();
+				$('html, body').css({overflow: 'hidden', height: '100%'});
+			}
+
+			else if ($(this).attr('id') == 'finRep' || $(this).attr('href').match('javascript')) {
+				return;
+			}
+
+			else {
+				$(".loader-template").show();
+				$('html, body').css({overflow: 'hidden', height: '100%'});
+			}
+		})
+	})
+
+	
+
+	
+
+
+	//$('.breadcrumb').insertAfter($('#election-title'));
+	$('.breadcrumb').prependTo($('.rep-container'));
+	$('#election-title').prependTo($('.rep-container'));
+
+
+	$(window).resize(function(){
+		if ($(this).width() <= 768) {
+			hideSidebar();
+		}
+	});
+
+	$(document).ready(function () {
+		let title = $("#vib-name").text();
+		$(".report-title").text(title);
+	});
+
+	$(document).ready(function () {
+		let link = localStorage.getItem("filtered-list");
+		$("#go-to-elections-list").attr("href", link);
+	});
+
+	$(document).ready(function () {
+		$(".list-link").on("click", function () {
+			localStorage.setItem("back-to-list-link", window.location.href);
+		});
+	});
+
+	// $(document).ready(function () {
+	// 	let link = sessionStorage.getItem("back-to-list-link");
+	// 	$("#back-to-list-btn").attr("href", link);
+	// });
+
+	$(document).ready(function () {
+		let name = $("#election-info-name-gen").text().trim();
+		if (name === "") {
+			$("#election-info-name,#election-info-name-mobile").hide();
+		} else {
+			$("#election-info-name,#election-info-name-mobile").text(name);
+		}
+	});
+
+	$(document).ready(function () {
+		let name = $("#standard-reports > table > thead > tr > th").text().trim();
+		if (name === "") {
+			$("#standard-reports-name,#standard-reports-name-mobile").hide();
+
+		} else {
+			$("#standard-reports-name,#standard-reports-name-mobile").text(name.charAt(0).toUpperCase() + name.substr(1).toLowerCase());
+		}
+	});
+
+	$(document).ready(function () {
+		let name = $("#election-process > table > thead > tr > th").text().trim();
+		if (name === "") {
+			$("#election-process-name,#election-process-name-mobile").hide();
+
+		} else {
+			$("#election-process-name,#election-process-name-mobile").text(name.charAt(0).toUpperCase() + name.substr(1).toLowerCase());
+		}
+	});
+
+	$(document).ready(function () {
+		let name = $("#digital-election-sites > table > thead > tr > th").text().trim();
+		if (name === "") {
+			$("#digital-election-sites-name,#digital-election-sites-name-mobile").hide();
+		} else {
+			$("#digital-election-sites-name,#digital-election-sites-name-mobile").text(name.charAt(0).toUpperCase() + name.substr(1).toLowerCase());
+		}
+	});
+
+	$(document).ready(function () {
+		let name = $("#digital-election-vote > table > thead > tr > th").text().trim();
+		if (name === "") {
+			$("#digital-election-vote-name,#digital-election-vote-name-mobile").hide();
+		} else {
+			$("#digital-election-vote-name,#digital-election-vote-name-mobile").text(name.charAt(0).toUpperCase() + name.substr(1).toLowerCase());
+		}
+	});
+
+	$(document).ready(function () {
+		let name = $("#digital-remote-election-data > table > thead > tr > th").text().trim();
+		if (name === "") {
+			$("#digital-remote-election-data-name,#digital-remote-election-data-name-mobile").hide();
+		} else {
+			$("#digital-remote-election-data-name,#digital-remote-election-data-name-mobile").text(name.charAt(0).toUpperCase() +
+					name.substr(1).toLowerCase());
+		}
+	});
+
+	$(document).ready(function () {
+		let name = $("#information-about-candidates > table > thead > tr > th").text().trim();
+		if (name === "") {
+			$("#information-about-candidates-name,#information-about-candidates-name-mobile").hide();
+		} else {
+			$("#information-about-candidates-name,#information-about-candidates-name-mobile").text(name.charAt(0).toUpperCase() + name.substr(1).toLowerCase());
+		}
+	});
+
+	$(document).ready(function () {
+		let name = $("#payment-results").text().trim();
+		let newLineIndex = name.indexOf('\n');
+		name = name.substring(0, newLineIndex);
+		if (name === "") {
+			$("#payment-results-name,#payment-results-name-mobile").hide();
+		} else {
+			$("#payment-results-name,#payment-results-name-mobile").text(name.charAt(0).toUpperCase() + name.substr(1).toLowerCase());
+		}
+
+	});
+
+	$(document).ready(function () {
+		let name = $("#election-results > table > thead > tr > th").text().trim();
+		if (name === "") {
+			$("#election-results-name,#election-results-name-mobile").hide();
+		} else {
+			$("#election-results-name,#election-results-name-mobile").text(name.charAt(0).toUpperCase() + name.substr(1).toLowerCase());
+		}
+	});
+
+	$(document).ready(function () {
+		let name = $("#vote-results > table > thead > tr > th").text().trim();
+		if (name === "") {
+			$("#vote-results-name,#vote-results-name-mobile").hide();
+		} else {
+			$("#vote-results-name,#vote-results-name-mobile").text(name.charAt(0).toUpperCase() +
+					name.substr(1).toLowerCase());
+		}
+	});
+
+	$(document).ready(function () {
+		if ($(".calendar_title").text() === "Календарь выборов") {
+			$("#election-nav,#election-nav-mobile").hide();
+		} else {
+			$("#election-nav,#election-nav-mobile").show();
+		}
+	});
+
+	$(document).ready(function () {
+		if ($(".calendar_title").text() !== "Календарь выборов") {
+			$("#election-nav-items,#election-nav-items-mobile").children().each(function () {
+				let text = $(this).text();
+				if (text === "") {
+					$(this).hide();
+				}
+			});
+		}
+	});
+
+	$(document).ready(function() {
+		$(".nav-link").on('click', function () {
+			$(".nav-link").removeClass("active").removeClass("show");
+		});
+	});
+
+	function expndColpsTableRows(rowId) {
+		let selector = "#payment-table .hideableRow" + rowId;
+		$(selector).toggleClass('hiddenRow');
+	}
+
+	function setRedirectFlag() {
+		localStorage.setItem("doOnce", "true");
+		localStorage.setItem("redirectFromElection", "true");
+	}
+
+	$(document).ready(function () {
+		var doOnce = localStorage.getItem("doOnce");
+		var redirect = localStorage.getItem("redirectFromElection");
+		if (redirect === "true" && doOnce === "true") {
+			localStorage.setItem("doOnce", "false");
+			$('#search_form').submit();
+		}
+	});
+
+	$(document).ready(function () {
+		$("#find-all").on('click', function () {
+			window.location.href = window.location.href;
+		});
+	});
+
+
+
+	// flex pagination
+	// $(document).ready(function () {
+	// 	$(".pagination").rPage();
+	// });
+
+	$(document).on("click", "#back-to-list-btn, #back-to-candidates-btn", function () {
+		window.history.go(-1);
+	})
+
+	$(document).on("click mousedown middleclick", "#220-rep-dir-link", function () {
+		localStorage.setItem("link-from-list", "false");
+		localStorage.setItem("back-to-candidates-show", "false");
+	})
+
+	$(document).on("click mousedown middleclick", ".list-link", function () {
+		localStorage.setItem("link-from-list", "true");
+		localStorage.setItem("back-to-candidates-show", "false");
+	})
+
+	$(document).on("click mousedown middleclick", "#party-list-link", function () {
+		localStorage.setItem("back-to-candidates-show", "true");
+	})
+
+
+	$(document).ready(function () {
+		var directLink = localStorage.getItem("link-from-list")
+		if (directLink == "false") {
+			$("#back-to-list-btn").hide();
+		} else if(directLink == "true") {
+			$("#back-to-list-btn").show();
+		}
+	})
+
+	$(document).ready(function () {
+		var boolean = localStorage.getItem("back-to-candidates-show")
+		if (boolean == "false") {
+			$("#back-to-candidates-btn").hide();
+		} else if(boolean == "true") {
+			$("#back-to-candidates-btn").show();
+		}
+	})
+
+	$(document).on('click', '#calendar-table .btn-block', function () {
+		var startDate = $(this).attr('onclick').substring(15, 25);
+		var endDate = $(this).attr('onclick').substring(29, 39);
+		localStorage.setItem("start_date", startDate);
+		localStorage.setItem("end_date", endDate);
+		$("#urovproved, #vidvibref, #vibtype, #actual_regions_subjcode, #old_regions_subjcode, #sxemavib")
+				.multiselect('deselectAll', false);
+		localStorage.setItem("urovproved", "");
+		localStorage.setItem("vidvibref", "");
+		localStorage.setItem("vibtype", "");
+		localStorage.setItem("actual_regions_subjcode", "");
+		localStorage.setItem("old_regions_subjcode", "");
+		localStorage.setItem("sxemavib", "");
+		$("#start_date").val(startDate);
+		$("#end_date").val(endDate);
+		$("#search_form").submit();
+	})
+
+	$(document).on('click', '#calendar-btn', function () {
+		localStorage.setItem("start_date", getStartDate());
+		localStorage.setItem("end_date", getEndDate());
+		$("#urovproved, #vidvibref, #vibtype, #actual_regions_subjcode, #old_regions_subjcode, #sxemavib")
+				.multiselect('deselectAll', false);
+		localStorage.setItem("urovproved", "");
+		localStorage.setItem("vidvibref", "");
+		localStorage.setItem("vibtype", "");
+		localStorage.setItem("actual_regions_subjcode", "");
+		localStorage.setItem("old_regions_subjcode", "");
+		localStorage.setItem("sxemavib", "");
+	})
+
+	function getStartDate() {
+		let dateTime = luxon.DateTime;
+		return dateTime.local().minus({ months: 1 }).startOf('month').toFormat("dd.MM.yyyy");
+	}
+
+	function getEndDate() {
+		let dateTime = luxon.DateTime;
+		return dateTime.local().plus({ months: 4 }).endOf('month').toFormat("dd.MM.yyyy");
+	}
+
+	var vrnvibref="100100225883172"
+	var tvd="100100225883448"
+	var region="19"
+	var root="1000050"
+	var global="null"
+	var vid="463"
+	var report_id="null"
+	var sub_region="19"
+	var viewtype="0"
+	var prver="0"
+	var pronetvd="null"
+	var report_mode = "null"
+	var tvdTreeJson = "";
+
+
+	
+
+	
+	tvdTreeJson = {"id":100100225883177,"text":"ЦИК России","href":"region/izbirkom?action=show&root=0&tvd=100100225883177&vrn=100100225883172&prver=0&pronetvd=null&region=0&sub_region=0","prver":"0","isUik":false,"selected":false,"load_on_demand":false,"children":[{"id":100100225883178,"text":"Республика Адыгея (Адыгея)","href":"region/izbirkom?action=show&root=1&tvd=100100225883178&vrn=100100225883172&prver=0&pronetvd=null&region=1&sub_region=1","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883400,"text":"Республика Алтай","href":"region/izbirkom?action=show&root=1&tvd=100100225883400&vrn=100100225883172&prver=0&pronetvd=null&region=2&sub_region=2","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883402,"text":"Республика Башкортостан","href":"region/izbirkom?action=show&root=1&tvd=100100225883402&vrn=100100225883172&prver=0&pronetvd=null&region=3&sub_region=3","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883409,"text":"Республика Бурятия","href":"region/izbirkom?action=show&root=1&tvd=100100225883409&vrn=100100225883172&prver=0&pronetvd=null&region=4&sub_region=4","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883411,"text":"Республика Дагестан","href":"region/izbirkom?action=show&root=1&tvd=100100225883411&vrn=100100225883172&prver=0&pronetvd=null&region=5&sub_region=5","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883415,"text":"Республика Ингушетия","href":"region/izbirkom?action=show&root=1&tvd=100100225883415&vrn=100100225883172&prver=0&pronetvd=null&region=6&sub_region=6","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883417,"text":"Кабардино-Балкарская Республика","href":"region/izbirkom?action=show&root=1&tvd=100100225883417&vrn=100100225883172&prver=0&pronetvd=null&region=7&sub_region=7","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883419,"text":"Республика Калмыкия","href":"region/izbirkom?action=show&root=1&tvd=100100225883419&vrn=100100225883172&prver=0&pronetvd=null&region=8&sub_region=8","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883421,"text":"Карачаево-Черкесская Республика","href":"region/izbirkom?action=show&root=1&tvd=100100225883421&vrn=100100225883172&prver=0&pronetvd=null&region=9&sub_region=9","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883423,"text":"Республика Карелия","href":"region/izbirkom?action=show&root=1&tvd=100100225883423&vrn=100100225883172&prver=0&pronetvd=null&region=10&sub_region=10","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883425,"text":"Республика Коми","href":"region/izbirkom?action=show&root=1&tvd=100100225883425&vrn=100100225883172&prver=0&pronetvd=null&region=11&sub_region=11","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883742,"text":"Республика Крым","href":"region/izbirkom?action=show&root=1&tvd=100100225883742&vrn=100100225883172&prver=0&pronetvd=null&region=93&sub_region=93","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883427,"text":"Республика Марий Эл","href":"region/izbirkom?action=show&root=1&tvd=100100225883427&vrn=100100225883172&prver=0&pronetvd=null&region=12&sub_region=12","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883429,"text":"Республика Мордовия","href":"region/izbirkom?action=show&root=1&tvd=100100225883429&vrn=100100225883172&prver=0&pronetvd=null&region=13&sub_region=13","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883431,"text":"Республика Саха (Якутия)","href":"region/izbirkom?action=show&root=1&tvd=100100225883431&vrn=100100225883172&prver=0&pronetvd=null&region=14&sub_region=14","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883433,"text":"Республика Северная Осетия - Алания","href":"region/izbirkom?action=show&root=1&tvd=100100225883433&vrn=100100225883172&prver=0&pronetvd=null&region=15&sub_region=15","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883435,"text":"Республика Татарстан (Татарстан)","href":"region/izbirkom?action=show&root=1&tvd=100100225883435&vrn=100100225883172&prver=0&pronetvd=null&region=16&sub_region=16","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883442,"text":"Республика Тыва","href":"region/izbirkom?action=show&root=1&tvd=100100225883442&vrn=100100225883172&prver=0&pronetvd=null&region=17&sub_region=17","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883444,"text":"Удмуртская Республика","href":"region/izbirkom?action=show&root=1&tvd=100100225883444&vrn=100100225883172&prver=0&pronetvd=null&region=18&sub_region=18","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883447,"text":"Республика Хакасия","href":"region/izbirkom?action=show&root=1&tvd=100100225883447&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":false,"children":[{"id":100100225883448,"text":"Республика Хакасия – Хакасский","href":"region/izbirkom?action=show&root=1000050&tvd=100100225883448&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":true,"load_on_demand":false,"children":[{"id":2192000705246,"text":"Абаканская городская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705246&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705247,"text":"Алтайская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705247&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705239,"text":"Аскизская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705239&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705243,"text":"Бейская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705243&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705237,"text":"Боградская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705237&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705248,"text":"Орджоникидзевская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705248&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705242,"text":"Саяногорская городская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705242&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705238,"text":"Таштыпская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705238&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705244,"text":"Усть-Абаканская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705244&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705241,"text":"Черногорская городская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705241&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705249,"text":"Ширинская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705249&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705240,"text":"Абазинская городская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705240&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":2192000705245,"text":"Сорская городская","href":"region/izbirkom?action=show&root=1000051&tvd=2192000705245&vrn=100100225883172&prver=0&pronetvd=null&region=19&sub_region=19","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]}]}]},{"id":100100225883449,"text":"Чеченская Республика","href":"region/izbirkom?action=show&root=1&tvd=100100225883449&vrn=100100225883172&prver=0&pronetvd=null&region=20&sub_region=20","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883451,"text":"Чувашская Республика - Чувашия","href":"region/izbirkom?action=show&root=1&tvd=100100225883451&vrn=100100225883172&prver=0&pronetvd=null&region=21&sub_region=21","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883454,"text":"Алтайский край","href":"region/izbirkom?action=show&root=1&tvd=100100225883454&vrn=100100225883172&prver=0&pronetvd=null&region=22&sub_region=22","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883739,"text":"Забайкальский край","href":"region/izbirkom?action=show&root=1&tvd=100100225883739&vrn=100100225883172&prver=0&pronetvd=null&region=92&sub_region=92","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883737,"text":"Камчатский край","href":"region/izbirkom?action=show&root=1&tvd=100100225883737&vrn=100100225883172&prver=0&pronetvd=null&region=91&sub_region=91","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883459,"text":"Краснодарский край","href":"region/izbirkom?action=show&root=1&tvd=100100225883459&vrn=100100225883172&prver=0&pronetvd=null&region=23&sub_region=23","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883468,"text":"Красноярский край","href":"region/izbirkom?action=show&root=1&tvd=100100225883468&vrn=100100225883172&prver=0&pronetvd=null&region=24&sub_region=24","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883732,"text":"Пермский край","href":"region/izbirkom?action=show&root=1&tvd=100100225883732&vrn=100100225883172&prver=0&pronetvd=null&region=90&sub_region=90","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883473,"text":"Приморский край","href":"region/izbirkom?action=show&root=1&tvd=100100225883473&vrn=100100225883172&prver=0&pronetvd=null&region=25&sub_region=25","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883477,"text":"Ставропольский край","href":"region/izbirkom?action=show&root=1&tvd=100100225883477&vrn=100100225883172&prver=0&pronetvd=null&region=26&sub_region=26","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883482,"text":"Хабаровский край","href":"region/izbirkom?action=show&root=1&tvd=100100225883482&vrn=100100225883172&prver=0&pronetvd=null&region=27&sub_region=27","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883485,"text":"Амурская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883485&vrn=100100225883172&prver=0&pronetvd=null&region=28&sub_region=28","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883487,"text":"Архангельская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883487&vrn=100100225883172&prver=0&pronetvd=null&region=29&sub_region=29","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883490,"text":"Астраханская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883490&vrn=100100225883172&prver=0&pronetvd=null&region=30&sub_region=30","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883492,"text":"Белгородская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883492&vrn=100100225883172&prver=0&pronetvd=null&region=31&sub_region=31","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883495,"text":"Брянская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883495&vrn=100100225883172&prver=0&pronetvd=null&region=32&sub_region=32","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883498,"text":"Владимирская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883498&vrn=100100225883172&prver=0&pronetvd=null&region=33&sub_region=33","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883501,"text":"Волгоградская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883501&vrn=100100225883172&prver=0&pronetvd=null&region=34&sub_region=34","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883506,"text":"Вологодская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883506&vrn=100100225883172&prver=0&pronetvd=null&region=35&sub_region=35","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883509,"text":"Воронежская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883509&vrn=100100225883172&prver=0&pronetvd=null&region=36&sub_region=36","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883514,"text":"Ивановская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883514&vrn=100100225883172&prver=0&pronetvd=null&region=37&sub_region=37","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883517,"text":"Иркутская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883517&vrn=100100225883172&prver=0&pronetvd=null&region=38&sub_region=38","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883522,"text":"Калининградская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883522&vrn=100100225883172&prver=0&pronetvd=null&region=39&sub_region=39","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883525,"text":"Калужская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883525&vrn=100100225883172&prver=0&pronetvd=null&region=40&sub_region=40","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883528,"text":"Кемеровская область - Кузбасс","href":"region/izbirkom?action=show&root=1&tvd=100100225883528&vrn=100100225883172&prver=0&pronetvd=null&region=42&sub_region=42","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883533,"text":"Кировская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883533&vrn=100100225883172&prver=0&pronetvd=null&region=43&sub_region=43","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883536,"text":"Костромская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883536&vrn=100100225883172&prver=0&pronetvd=null&region=44&sub_region=44","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883538,"text":"Курганская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883538&vrn=100100225883172&prver=0&pronetvd=null&region=45&sub_region=45","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883560,"text":"Курская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883560&vrn=100100225883172&prver=0&pronetvd=null&region=46&sub_region=46","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883563,"text":"Ленинградская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883563&vrn=100100225883172&prver=0&pronetvd=null&region=47&sub_region=47","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883567,"text":"Липецкая область","href":"region/izbirkom?action=show&root=1&tvd=100100225883567&vrn=100100225883172&prver=0&pronetvd=null&region=48&sub_region=48","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883570,"text":"Магаданская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883570&vrn=100100225883172&prver=0&pronetvd=null&region=49&sub_region=49","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883572,"text":"Московская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883572&vrn=100100225883172&prver=0&pronetvd=null&region=50&sub_region=50","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883604,"text":"Мурманская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883604&vrn=100100225883172&prver=0&pronetvd=null&region=51&sub_region=51","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883606,"text":"Нижегородская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883606&vrn=100100225883172&prver=0&pronetvd=null&region=52&sub_region=52","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883612,"text":"Новгородская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883612&vrn=100100225883172&prver=0&pronetvd=null&region=53&sub_region=53","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883614,"text":"Новосибирская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883614&vrn=100100225883172&prver=0&pronetvd=null&region=54&sub_region=54","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883619,"text":"Омская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883619&vrn=100100225883172&prver=0&pronetvd=null&region=55&sub_region=55","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883623,"text":"Оренбургская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883623&vrn=100100225883172&prver=0&pronetvd=null&region=56&sub_region=56","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883627,"text":"Орловская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883627&vrn=100100225883172&prver=0&pronetvd=null&region=57&sub_region=57","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883629,"text":"Пензенская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883629&vrn=100100225883172&prver=0&pronetvd=null&region=58&sub_region=58","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883632,"text":"Псковская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883632&vrn=100100225883172&prver=0&pronetvd=null&region=60&sub_region=60","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883634,"text":"Ростовская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883634&vrn=100100225883172&prver=0&pronetvd=null&region=61&sub_region=61","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883642,"text":"Рязанская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883642&vrn=100100225883172&prver=0&pronetvd=null&region=62&sub_region=62","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883645,"text":"Самарская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883645&vrn=100100225883172&prver=0&pronetvd=null&region=63&sub_region=63","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883651,"text":"Саратовская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883651&vrn=100100225883172&prver=0&pronetvd=null&region=64&sub_region=64","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883656,"text":"Сахалинская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883656&vrn=100100225883172&prver=0&pronetvd=null&region=65&sub_region=65","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883658,"text":"Свердловская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883658&vrn=100100225883172&prver=0&pronetvd=null&region=66&sub_region=66","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883666,"text":"Смоленская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883666&vrn=100100225883172&prver=0&pronetvd=null&region=67&sub_region=67","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883669,"text":"Тамбовская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883669&vrn=100100225883172&prver=0&pronetvd=null&region=68&sub_region=68","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883672,"text":"Тверская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883672&vrn=100100225883172&prver=0&pronetvd=null&region=69&sub_region=69","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883675,"text":"Томская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883675&vrn=100100225883172&prver=0&pronetvd=null&region=70&sub_region=70","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883678,"text":"Тульская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883678&vrn=100100225883172&prver=0&pronetvd=null&region=71&sub_region=71","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883681,"text":"Тюменская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883681&vrn=100100225883172&prver=0&pronetvd=null&region=72&sub_region=72","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883684,"text":"Ульяновская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883684&vrn=100100225883172&prver=0&pronetvd=null&region=73&sub_region=73","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883687,"text":"Челябинская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883687&vrn=100100225883172&prver=0&pronetvd=null&region=74&sub_region=74","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883693,"text":"Ярославская область","href":"region/izbirkom?action=show&root=1&tvd=100100225883693&vrn=100100225883172&prver=0&pronetvd=null&region=76&sub_region=76","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883696,"text":"город Москва","href":"region/izbirkom?action=show&root=1&tvd=100100225883696&vrn=100100225883172&prver=0&pronetvd=null&region=77&sub_region=77","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883712,"text":"город Санкт-Петербург","href":"region/izbirkom?action=show&root=1&tvd=100100225883712&vrn=100100225883172&prver=0&pronetvd=null&region=78&sub_region=78","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883746,"text":"город Севастополь","href":"region/izbirkom?action=show&root=1&tvd=100100225883746&vrn=100100225883172&prver=0&pronetvd=null&region=94&sub_region=94","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883721,"text":"Еврейская автономная область","href":"region/izbirkom?action=show&root=1&tvd=100100225883721&vrn=100100225883172&prver=0&pronetvd=null&region=79&sub_region=79","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883723,"text":"Ненецкий автономный округ","href":"region/izbirkom?action=show&root=1&tvd=100100225883723&vrn=100100225883172&prver=0&pronetvd=null&region=83&sub_region=83","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883725,"text":"Ханты-Мансийский автономный округ - Югра","href":"region/izbirkom?action=show&root=1&tvd=100100225883725&vrn=100100225883172&prver=0&pronetvd=null&region=86&sub_region=86","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883728,"text":"Чукотский автономный округ","href":"region/izbirkom?action=show&root=1&tvd=100100225883728&vrn=100100225883172&prver=0&pronetvd=null&region=87&sub_region=87","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]},{"id":100100225883730,"text":"Ямало-Ненецкий автономный округ","href":"region/izbirkom?action=show&root=1&tvd=100100225883730&vrn=100100225883172&prver=0&pronetvd=null&region=89&sub_region=89","prver":"0","isUik":false,"selected":false,"load_on_demand":true,"children":[]}]}
+			
+			
+			function iterateTree(node,li){
+				if(node.children.length > 0) {
+					var ul = createUl(li);
+					node.children.forEach(el => {
+						var liChild = createLi(ul, el);
+						iterateTree(el,liChild);
+					})
+				}
+			}
+
+	function addChildren(data,li){
+		var ul = createUl(li);
+		data.forEach(el => {
+			//var liChild = createLi(ul, el);
+			createLi(ul,el);
+			//iterateTree(el,liChild);
+		})
+	}
+
+	function createUl(element){
+		var ul = $('<ul></ul>');
+		ul.appendTo(element);
+		return ul;
+		//return element.append('<ul></ul>').children("ul:first-child");
+	}
+	var height;
+	var heightPercent;
+	var arrOpen = '<svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0.578125 1.40625L1.98438 0L7.98438 6L1.98438 12L0.578125 10.5938L5.17188 6L0.578125 1.40625Z" fill="#1A7FC7"/> </svg>';
+	var arrClose = '<svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M10.5938 0.578125L12 1.98438L6 7.98438L0 1.98438L1.40625 0.578125L6 5.17188L10.5938 0.578125Z" fill="#13232F"/> </svg>';
+	var opened = '<svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 11.2188L16.5938 0.578125L18 1.98438L6 13.9844L0.421875 8.40625L1.78125 7L6 11.2188Z" fill="#1A7FC7"/></svg>';
+	var tree = '<i class="material-icons" style="color: #1A7FC7;">account_tree</i>'
+
+	var vibidUrl = report_id === vrnvibref ? ( "&vibid=" + report_id) : "";
+	// /*+  (report_id != null && report_id !== "null" ? " (&vibid=" + report_id) : '') */
+	var reportModeUrl = report_mode !== "" ? "&report_mode=" + report_mode : "";
+	var selectedPrver;
+
+	function createLi(element, obj){
+		let button = "" ;
+		let need_load = obj.load_on_demand ? "need-load" : "";
+		if(!obj.isUik) {
+			if (obj.children.length > 0) {
+				button = "<a class='tree-open " + need_load +  "' >"+arrClose+"</a>";
+			} else {
+				button = "<a class='tree-close " + need_load + "'>"+arrOpen+"</a>";
+			}
+		}
+		if(obj.selected){
+			selectedPrver = obj.prver;
+		}
+		element.append('<li id="'+ obj.id + '" class="tree-li">' + button  + "<a  class='" + (obj.selected ? "selected-li" : "") + "' href='" + obj.href + "&type=" + vid + vibidUrl + reportModeUrl +  "'> " + obj.text + "</a> " + (obj.selected ? opened : "") +'</li>');
+		//document.getElementById(obj.id).appendChild(buttonNode);
+		//$('#'+obj.id).append(button);
+		return $('#'+obj.id);
+	}
+
+
+	//&#9658;
+	//&#9660;
+
+	function closeTree () {
+		height = $('#jstree_demo_div').height();
+		heightTranslate = height/2 - 22;
+		$('#jstree_demo_div').css('height',height+'px');
+		$('.hideTreeIcon').css('transform', 'rotate(180deg)').css('transition-duration','0.5s');
+		//$('.hideTreeIcon').css('transform', 'translate(0,'+''+heightTranslate+'px'+') rotate(180deg)').css('transition-duration','0.5s');
+		//$('#jstree_demo_div').css('background','transparent');
+		$('#jstree_demo_div').css('max-width','2%').css('transition-duration','0.5s');
+		$('.tvd').css('opacity','0').css('transition-duration','0.5s');
+		$('#jstree_demo_div ul').css('opacity','0').css('transition-duration','0.5s');
+		$(this).removeClass('hideTreeIcon').addClass('showTreeIcon');
+		$('#jstree_demo_div').addClass('swapped');
+		localStorage.setItem("treeState", "true");
+		//$('.tree').hide();
+		//$('.treeIcon').show();
+	}
+
+	function openTree () {
+		$('#jstree_demo_div').removeClass('swapped')
+		//$('.tree').show();
+		//$('.treeIcon').hide();
+		//$('.showTreeIcon').css('transform', 'translate(0px, 0px) rotate(1deg)').css('transition-duration','0.5s');
+		$('.showTreeIcon').css('transform', 'rotate(1deg)').css('transition-duration','0.5s');
+		$('#jstree_demo_div').css('max-width','100%').css('height','100%').css('transition-duration','0.5s');;
+		$('#jstree_demo_div ul').css('opacity','1').css('transition-duration','0.5s');
+		$('.tvd').css('opacity','1').css('transition-duration','0.5s');
+		$('.showTreeIcon').removeClass('showTreeIcon').addClass('hideTreeIcon');
+		localStorage.setItem("treeState", "false");
+	}
+
+
+	if (tvdTreeJson != "") {
+		var mainul = createUl($('#jstree_demo_div'));
+		var mainli = createLi(mainul,tvdTreeJson);
+		iterateTree(tvdTreeJson, mainli);
+
+
+		$(document).ready(function () {
+			$(document).on('click', '.hideTreeIcon', closeTree);
+			$(document).on('click', '.swapped', openTree);
+
+			$(document).on('click', '.tree-open', function () {
+				//$(this).next().next().next().css("display", "none");
+				//$(this).closest('ul').css("display", "none");
+				//$(this).next().next('ul').css("display", "none");
+				$(this).parent().find('ul').css("display", "none");
+				$(this).removeClass('tree-open').addClass('tree-close');
+				$(this).html(arrOpen);
+			});
+
+			if($('#0').length > 0 && selectedPrver === "1"){
+				$('#0').children(":first").removeClass('tree-open').addClass('tree-close');
+				$('#0').children(":first").html(arrOpen);
+				$('#0').children('ul').css("display", "none");
+			}
+
+			$(document).on('click', '.need-load', function () {
+				$(this).removeClass('need-load');
+				var tvd = $(this).parent().attr('id');
+				var url = "/region/izbirkom?action=tvdTree&tvdchildren=true&vrn=" + vrnvibref + "&tvd=" + tvd;
+				var parent = $(this).parent();
+				$.ajax({
+					type: "GET",
+					url: url,
+					beforeSend: function() {
+						$(".loader-template").show();
+					},
+					success: function(data) {
+						addChildren(data, parent);
+						$(".loader-template").hide();
+					}
+				});
+
+				//
+				// $.get(url, function (data) {
+				// 	addChildren(data, parent);
+				// })
+				// $(this).next().next().css("display", "none");
+				// $(this).removeClass('tree-open').addClass('tree-close');
+				// $(this).html("&#9658;");
+			});
+
+
+			$(document).on('click', '.tree-close', function () {
+				//$(this).next().next().next().css("display", "block");
+				//$(this).closest('ul').css("display", "block");
+				$(this).parent().find('ul').css("display", "block");
+				//$(this).next().next('ul').css("display", "block");
+				$(this).removeClass('tree-close').addClass('tree-open');
+				$(this).html(arrClose);
+			});
+
+			// $(".tree-close").click(function() {
+
+			// });
+		});
+	}
+
+
+	
+	$('#report-body > .date-generation').hide();
+	$('#report-body-link').tab('show');
+
+	
+	$(window).on("unload", function(e) {});
+	$(window).bind("unload", function() { });
+	$(window).bind("pageshow", function(event) {
+		if (event.originalEvent.persisted) {
+			window.location.reload()
+		}
+	});
+
+</script>
+<style>
+	.tree-li a {
+		cursor: pointer;
+	}
+
+	.tree-li {
+		list-style: none;
+	}
+
+	.ul-open {
+
+	}
+
+	.ul-close {
+
+	}
+
+</style>
+
+
+
+
+
+<script>
+
+
+	function isElementInViewport(el) {
+		var rect = el.getBoundingClientRect();
+
+		return rect.bottom > 0 && rect.top < (window.innerHeight || document.documentElement.clientHeight) /* or $(window).height() */;
+	}
+
+	function showVib() {
+
+
+		let elems = document.querySelectorAll('.vibory-list-item')
+		Array.prototype.forEach.call (elems, function (node) {
+			if (!isElementInViewport(node)) return
+			var currentNode = node.nextElementSibling;
+			var cnt = 0;
+			while(!currentNode.classList.contains('vibory-list-item') && cnt <= 50) {
+				currentNode.classList.remove('hidden-vibory');
+				currentNode = currentNode.nextElementSibling;
+				cnt++;
+			}
+		})
+		elems = document.querySelectorAll('.list-group-item')
+		Array.prototype.forEach.call (elems, function (node) {
+			if (!isElementInViewport(node)) return
+			var currentNode = node;
+			var cnt = 0;
+
+			while(cnt <= 50) {
+				if (currentNode != null) {
+					currentNode.classList.remove('hidden-vibory');
+					currentNode = currentNode.previousSibling;
+
+				}
+				cnt++;
+			}
+			currentNode = node;
+			cnt = 0;
+
+			while(cnt <= 50) {
+				if (currentNode != null) {
+					currentNode.classList.remove('hidden-vibory');
+					currentNode = currentNode.nextElementSibling;
+				}
+				cnt++;
+			}
+		})
+	}
+	window.addEventListener('scroll', showVib, { capture: true });
+</script>
+</body>
+</html>
+
+

@@ -52,10 +52,13 @@ namespace Izbirkom21
       if (File.Exists(path))
         return path;
 
+      var requestUri = $"http://izbirkom.ru/{directory}/{name}";
+      Console.Write($"Downloading font from {requestUri}");
       HttpClient client = new HttpClient();
       client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0");
-      var fontContent = client.GetByteArrayAsync($"http://izbirkom.ru/{directory}/{name}").Result;
+      var fontContent = client.GetByteArrayAsync(requestUri).Result;
       File.WriteAllBytes(path, fontContent);
+      Console.WriteLine();
       return path;
     }
 

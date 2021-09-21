@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -77,6 +78,19 @@ namespace Izbirkom21
 
     private static void RemoveAndExecuteScripts(HtmlDocument htmlDocument)
     {
+      var classToNodesLookup = new Dictionary<string, List<HtmlNode>>();
+      foreach (var node in htmlDocument.DocumentNode.Descendants())
+      {
+        if (node.Name == "span" || node.Name == "b" || node.Name == "td" || node.Name == "nobr")
+        {
+          foreach (var cls in node.GetAttributeValue("class", "").Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+          {
+            var list = classToNodesLookup.TryGetValue(cls, out var l) ? l : classToNodesLookup[cls] = new List<HtmlNode>();
+            list.Add(node);
+          }
+        }
+      }
+
       var mainTable = htmlDocument.DocumentNode.SelectSingleNode("//table[contains(@class, 'table-sm')]");
       // remove and execute scripts
       foreach (var script in htmlDocument.DocumentNode.SelectNodes("//script"))
@@ -99,11 +113,11 @@ namespace Izbirkom21
             }
             else if (int.TryParse(g2, out var result))
             {
-              MorphElementsByStyleName(htmlDocument, className, RemoveChar(result));
+              MorphElementsByStyleName(classToNodesLookup, className, RemoveChar(result));
             }
             else
             {
-              MorphElementsByStyleName(htmlDocument, className, _ => g2.Trim('\'', ' '));
+              MorphElementsByStyleName(classToNodesLookup, className, _ => g2.Trim('\'', ' '));
             }
           }
         }
@@ -129,12 +143,17 @@ namespace Izbirkom21
       }
     }
 
-    private static void MorphElementsByStyleName(HtmlDocument htmlDocument, string className, Func<string, string> morpher)
+    private static void MorphElementsByStyleName(IReadOnlyDictionary<string, List<HtmlNode>> classToNodesLookup, string className, Func<string, string> morpher)
     {
-      foreach (var node in htmlDocument.DocumentNode.SelectNodes($"(//span|//b|//td|//nobr)[contains(@class, '{className}')]").Reverse())
+      if (classToNodesLookup.TryGetValue(className, out var list))
       {
-        node.InnerHtml = morpher(node.InnerHtml);
+        foreach (var node in list)
+        {
+          node.InnerHtml = morpher(node.InnerHtml);
+        }
       }
+      else
+        Console.Error.WriteLine($"Node by class name `{className}` not found. It is likely an error ");
     }
 
     private static Func<string, string> RemoveChar(int index)

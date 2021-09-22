@@ -1,27 +1,85 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using ExCSS;
 using HtmlAgilityPack;
 using Typography.OpenFont;
 
 namespace Izbirkom21
 {
+  public interface IFontProvider
+  {
+    ConcurrentDictionary<object, object> Cache { get; }
+
+    Task<byte[]> GetFont(string name, string directory);
+  }
+
+  public class CacheFontProvider : IFontProvider
+  {
+    public string FontsDirectory = Environment.GetEnvironmentVariable("IZ_CACHE") ?? Path.Combine(Directory.GetCurrentDirectory(), "fonts_cache");
+    private readonly IFontProvider _delegateTo;
+
+    public CacheFontProvider(IFontProvider delegateTo)
+    {
+      _delegateTo = delegateTo;
+    }
+
+    public ConcurrentDictionary<object, object> Cache { get; } = new ConcurrentDictionary<object, object>();
+
+    public async Task<byte[]> GetFont(string name, string directory)
+    {
+      if (!Directory.Exists(FontsDirectory))
+        Directory.CreateDirectory(FontsDirectory);
+
+      var path = Path.Combine(FontsDirectory, name);
+      if (File.Exists(path))
+        return await File.ReadAllBytesAsync(path);
+
+      var bytes = await _delegateTo.GetFont(name, directory);
+      await File.WriteAllBytesAsync(path, bytes);
+
+      return bytes;
+    }
+  }
+
+  public class DownloadFontProvider : IFontProvider
+  {
+    public ConcurrentDictionary<object, object> Cache { get; } = new ConcurrentDictionary<object, object>();
+
+    public async Task<byte[]> GetFont(string name, string directory)
+    {
+      var requestUri = $"http://izbirkom.ru/{directory}/{name}";
+      Console.Write($"Downloading font from {requestUri}");
+      var client = new HttpClient();
+      client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0");
+      var fontContent = await client.GetByteArrayAsync(requestUri);
+      Console.WriteLine("done");
+      return fontContent;
+    }
+  }
+
   public class FontReplacer
   {
-    public string FontsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "fonts_cache");
-
     /// css class name -> font name (guid.ttf)
-    private static Dictionary<string, string> _classToFont = new();
+    private Dictionary<string, string> _classToFont = new();
 
     /// font-family name -> font name (guid.ttf)
     private Dictionary<string, string> _fonts = new();
 
     /// font name (guid.ttf) -> Converter
     private Dictionary<string, Func<char, char>> _fontToConverter = new();
+
+    private IFontProvider _fontProvider;
+
+    public FontReplacer(IFontProvider fontProvider)
+    {
+      _fontProvider = fontProvider;
+    }
 
     public void VisitStyleRule(IStyleRule styleRule)
     {
@@ -43,31 +101,19 @@ namespace Izbirkom21
       }
     }
 
-    private string GetOrDownloadFont(string name, string directory)
-    {
-      if (!Directory.Exists(FontsDirectory))
-        Directory.CreateDirectory(FontsDirectory);
-
-      var path = Path.Combine(FontsDirectory, name);
-      if (File.Exists(path))
-        return path;
-
-      var requestUri = $"http://izbirkom.ru/{directory}/{name}";
-      Console.Write($"Downloading font from {requestUri}");
-      HttpClient client = new HttpClient();
-      client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0");
-      var fontContent = client.GetByteArrayAsync(requestUri).Result;
-      File.WriteAllBytes(path, fontContent);
-      Console.WriteLine();
-      return path;
-    }
-
+    private static object CacheKey = new();
     private Func<char, char> ReadFont(string fontValue)
     {
-      using var izbFontStream = File.OpenRead(GetOrDownloadFont(fontValue, "fonts1"));
-      var izb = new OpenFontReader().Read(izbFontStream);
-      using var originalFontStream = File.OpenRead(GetOrDownloadFont("pt-sans-v12-latin_cyrillic-regular.ttf", "fonts"));
-      var ptsans = new OpenFontReader().Read(originalFontStream);
+      var converter = (ConcurrentDictionary<string, Func<char, char>>) 
+        _fontProvider.Cache.GetOrAdd(CacheKey, x => new ConcurrentDictionary<string, Func<char, char>>());
+
+      if (converter.TryGetValue(fontValue, out var translator))
+      {
+        return translator;
+      }
+
+      var izb = new OpenFontReader().Read(new MemoryStream(_fontProvider.GetFont(fontValue, "fonts1").Result));
+      var ptsans = new OpenFontReader().Read(new MemoryStream(_fontProvider.GetFont("pt-sans-v12-latin_cyrillic-regular.ttf", "fonts").Result));
 
       List<char> alphabet = new();
       for (char l = 'A'; l <= 'Z'; l++) alphabet.Add(l);
@@ -80,7 +126,9 @@ namespace Izbirkom21
       foreach (var c in alphabet)
         glyphIndexToLetter[ptsans.GetGlyphIndex(c)] = c;
 
-      return c => glyphIndexToLetter[izb.GetGlyphIndex(c)];
+      translator = c => glyphIndexToLetter[izb.GetGlyphIndex(c)];
+      converter[fontValue] = translator;
+      return translator;
     }
 
     public void TranslateNode(string cls, HtmlNode node)

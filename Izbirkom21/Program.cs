@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using ExCSS;
 using HtmlAgilityPack;
 
@@ -13,22 +14,80 @@ namespace Izbirkom21
   {
     static int Main(string[] args)
     {
-      if (args.Length == 0)
+      if (args.Length != 2)
       {
         Console.WriteLine("use:");
-        Console.WriteLine("    dotnet run <saved html page> [output]");
+        Console.WriteLine("    dotnet run <saved html page> <output>");
+        Console.WriteLine("    dotnet run <directory with *.html> <output folder>");
+
         return -1;
       }
+      Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
+      var fontProvider = new CacheFontProvider(new DownloadFontProvider());
+      var inputArg = args[0];
+      var outputArg = args[1];
+      if (Directory.Exists(inputArg))
+      {
+        // batch processing
+        var directory = Directory.GetFiles(inputArg);
+        var outputFiles = new HashSet<string>(Directory.GetFiles(outputArg));
+        Parallel.ForEach(directory, new ParallelOptions(), 
+          file =>
+        {
+          try
+          {
+            var outputPath = Path.Combine(outputArg, Path.GetRelativePath(inputArg, file));
+            if (outputFiles.Contains(outputPath))
+            {
+              Console.WriteLine($"Skip: {outputPath}");
+              return;
+            }
+            
+            Console.WriteLine($"Processing {file} to {outputPath}");
+            SaveFile(fontProvider, file, outputPath);
+          }
+          catch (KnownException exception)
+          {
+            Console.Error.WriteLine($"Error processing file: {file}: {exception.Message}");
+          }
+          catch (Exception)
+          {
+            Console.Error.WriteLine($"Error processing file: {file}");
+            throw;
+          }
+        });
+      }
+      else
+      {
+        SaveFile(fontProvider, inputArg, outputArg);
+      }
+
+
+      return 0;
+    }
+
+    private static void SaveFile(IFontProvider fontProvider, string inputPath, string outputPath)
+    {
+      var inputText = File.ReadAllText(inputPath, Encoding.GetEncoding("windows-1251"));
+      var htmlDocument = Deobfuscate(inputText, fontProvider, inputPath);
+      htmlDocument.Save(outputPath, Encoding.UTF8);
+    }
+
+    public static HtmlDocument Deobfuscate(string inputHtml, IFontProvider fontProvider, string tag)
+    {
       var htmlDocument = new HtmlDocument();
       Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-      htmlDocument.Load(File.OpenRead(args[0]), Encoding.GetEncoding("windows-1251"));
+      htmlDocument.LoadHtml(inputHtml);
 
       var cssParser = new StylesheetParser();
-      var fonts = new FontReplacer();
+      var fonts = new FontReplacer(fontProvider);
       var content = new FixedContentMorpher();
 
       var styles = htmlDocument.DocumentNode.SelectNodes("//style");
+      if (styles == null)
+        throw new KnownException("styles not found, unknown input format or already deobfuscated file");
+
       foreach (var style in styles)
       {
         var sheet = cssParser.Parse(style.InnerHtml);
@@ -52,11 +111,7 @@ namespace Izbirkom21
       content.ReplaceFixedContent(htmlDocument, fonts);
 
       FinalCleanup(htmlDocument);
-
-      if (args.Length >= 2)
-        htmlDocument.Save(args[1], Encoding.UTF8);
-      
-      return 0;
+      return htmlDocument;
     }
 
     private static void FinalCleanup(HtmlDocument htmlDocument)
@@ -92,8 +147,11 @@ namespace Izbirkom21
       }
 
       var mainTable = htmlDocument.DocumentNode.SelectSingleNode("//table[contains(@class, 'table-sm')]");
+      if (mainTable == null)
+        throw new KnownException("main table not found, unknown format");
+      
       // remove and execute scripts
-      foreach (var script in htmlDocument.DocumentNode.SelectNodes("//script"))
+      foreach (var script in htmlDocument.DocumentNode.SelectNodes("//script") ?? Enumerable.Empty<HtmlNode>())
       {
         var scriptInnerHtml = script.InnerHtml.Split(';');
         foreach (var str in scriptInnerHtml)
@@ -160,6 +218,13 @@ namespace Izbirkom21
     {
       if (index < 0) return s => s.Remove(s.Length - 1, 1);
       return s => s.Remove(index, 1);
+    }
+  }
+
+  internal class KnownException : Exception
+  {
+    public KnownException(string message) : base(message)
+    {
     }
   }
 }
